@@ -1,0 +1,100 @@
+- id: T-001
+  title: Login gagal massal (CORS origin :5173 vs :5174)
+  severity: High
+  status: Closed
+  opened: "2026-09-14"
+  closed: "2026-09-14"
+  timeline: ["Lapor: tak bisa login", "Log hanya OPTIONS tanpa POST", "Temu: FRONTEND_URL default :5173", "Fix: restart FRONTEND_URL=:5174", "Verifikasi: ACAO benar + login 200"]
+  diagnosis: CORS origin mismatch (matrix #3)
+  resolution: Restart API dengan FRONTEND_URL benar + koreksi .env.example
+  prevention: Checklist runbook #3; FRONTEND_URL di .env, bukan default
+- id: T-002
+  title: Database tak sengaja terhapus (simulasi)
+  severity: High
+  status: Closed
+  opened: "2026-09-14"
+  closed: "2026-09-14"
+  timeline: ["Simulasi: rm lifeos.db di /tmp", "Backup harian tersedia", "Restore via skrip", "Verifikasi: 25 tasks + 19 goals kembali"]
+  diagnosis: Human error (simulasi terkontrol)
+  resolution: Roundtrip backup→hapus→restore OK
+  prevention: Backup otomatis harian + guard restore tolak saat API jalan
+- id: T-003
+  title: 401 semua user setelah ganti secret
+  severity: Medium
+  status: Closed
+  opened: "2026-09-13"
+  closed: "2026-09-13"
+  timeline: ["Lapor: semua sesi logout", "Cek: JWT_SECRET baru di-deploy", "Konfirmasi by design"]
+  diagnosis: Token lama tak valid dengan secret baru (matrix #4)
+  resolution: "Komunikasi ke user: login ulang"
+  prevention: Umumkan rotasi secret sebelum deploy
+- id: T-004
+  title: "Seed error UNIQUE (users)"
+  severity: Low
+  status: Closed
+  opened: "2026-09-12"
+  closed: "2026-09-12"
+  timeline: ["Seed dijalankan 2x", "Cek COUNT users = 1", "Skip seed (data sudah ada)"]
+  diagnosis: Seed tak idempoten (matrix #8)
+  resolution: Tak perlu aksi; dokumentasikan reset bila perlu
+  prevention: Cek COUNT sebelum seed
+- id: T-005
+  title: Dashboard lambat saat tasks menumpuk
+  severity: Low
+  status: Open
+  opened: "2026-09-14"
+  closed: ""
+  timeline: ["Observasi: N+1 (tasks + habits per item)"]
+  diagnosis: Query agregat per baris, belum dioptimasi
+  resolution: ""
+  prevention: Indeks + agregat SQL bila tasks > 1000
+- id: T-006
+  title: Web blank setelah update
+  severity: Medium
+  status: Closed
+  opened: "2026-09-11"
+  closed: "2026-09-11"
+  timeline: ["Lapor: putih", "curl title OK", "Ternyata cache browser lama"]
+  diagnosis: Cache (matrix #11)
+  resolution: Hard refresh; verifikasi build hijau
+  prevention: Versioned asset (Vite hashing sudah)
+- id: T-007
+  title: Backup 0 byte
+  severity: Medium
+  status: Closed
+  opened: "2026-09-10"
+  closed: "2026-09-10"
+  timeline: ["Cek ukuran backup", "df: partisi penuh (simulasi)", "Bersihkan + rerun"]
+  diagnosis: Disk penuh (matrix #9)
+  resolution: Rotasi 7 hari + monitor df
+  prevention: Alert saat avail < 10%
+- id: T-008
+  title: Token expired tengah sesi
+  severity: Low
+  status: Closed
+  opened: "2026-09-09"
+  closed: "2026-09-09"
+  timeline: ["Auto-logout setelah 24 jam", "Login ulang OK"]
+  diagnosis: exp JWT 24 jam (by design, matrix #10)
+  resolution: Login ulang
+  prevention: Dokumentasikan di FAQ
+- id: T-009
+  title: Migrasi pending setelah pull
+  severity: Low
+  status: Closed
+  opened: "2026-09-08"
+  closed: "2026-09-08"
+  timeline: ["Endpoint baru 404", "goose status: 2 Pending", "goose up OK"]
+  diagnosis: Lupa migrate (matrix #13)
+  resolution: goose up + restart
+  prevention: "Checklist deploy: migrate dulu"
+- id: T-010
+  title: Salah sangka PUT hapus field
+  severity: Low
+  status: Closed
+  opened: "2026-09-07"
+  closed: "2026-09-07"
+  timeline: ["Lapor: data hilang", "Cek: PUT full-replace by design", "UI kirim penuh OK"]
+  diagnosis: Ekspektasi vs kontrak (BUG-001 QA)
+  resolution: Edukasi + README menegaskan
+  prevention: Kontrak PUT didokumentasikan di swagger
